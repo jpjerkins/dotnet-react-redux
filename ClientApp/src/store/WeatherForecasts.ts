@@ -21,12 +21,12 @@ export interface WeatherForecast {
 // ACTIONS - These are serializable (hence replayable) descriptions of state transitions.
 // They do not themselves have any side-effects; they just describe something that is going to happen.
 
-interface RequestWeatherForecastsAction {
+export interface RequestWeatherForecastsAction {
     type: 'REQUEST_WEATHER_FORECASTS';
     startDateIndex: number;
 }
 
-interface ReceiveWeatherForecastsAction {
+export interface ReceiveWeatherForecastsAction {
     type: 'RECEIVE_WEATHER_FORECASTS';
     startDateIndex: number;
     forecasts: WeatherForecast[];
@@ -40,20 +40,13 @@ type KnownAction = RequestWeatherForecastsAction | ReceiveWeatherForecastsAction
 // ACTION CREATORS - These are functions exposed to UI components that will trigger a state transition.
 // They don't directly mutate state, but they can have external side-effects (such as loading data).
 
-export const actionCreators = {
-    requestWeatherForecasts: (startDateIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
-        // Only load data if it's something we don't already have (and are not already loading)
-        const appState = getState();
-        if (appState && appState.weatherForecasts && startDateIndex !== appState.weatherForecasts.startDateIndex) {
-            fetch(`weatherforecast`)
-                .then(response => response.json() as Promise<WeatherForecast[]>)
-                .then(data => {
-                    dispatch({ type: 'RECEIVE_WEATHER_FORECASTS', startDateIndex: startDateIndex, forecasts: data });
-                });
+export interface WeatherForecastsRequestedAction { type: 'WEATHER_FORECASTS_REQUESTED', payload: {startDateIndex: number} };
 
-            dispatch({ type: 'REQUEST_WEATHER_FORECASTS', startDateIndex: startDateIndex });
-        }
-    }
+export const actionCreators = {
+    requestWeatherForecasts: (startDateIndex: number): RequestWeatherForecastsAction => ({
+        type: 'REQUEST_WEATHER_FORECASTS',
+        startDateIndex: startDateIndex,
+    })
 };
 
 // ----------------

@@ -3,10 +3,18 @@ import thunk from 'redux-thunk';
 import { connectRouter, routerMiddleware } from 'connected-react-router';
 import { History } from 'history';
 import { ApplicationState, reducers } from './';
+import createSagaMiddleware from 'redux-saga';
+import weatherForecastSaga from '../sagas/WeatherForecastSaga';
+
+const initializeSagaMiddleware = createSagaMiddleware();
+
+declare global {
+    interface Window { store: any; }
+}
 
 export default function configureStore(history: History, initialState?: ApplicationState) {
     const middleware = [
-        thunk,
+        initializeSagaMiddleware,
         routerMiddleware(history)
     ];
 
@@ -21,9 +29,14 @@ export default function configureStore(history: History, initialState?: Applicat
         enhancers.push(windowIfDefined.__REDUX_DEVTOOLS_EXTENSION__());
     }
 
-    return createStore(
+    var store = createStore(
         rootReducer,
         initialState,
         compose(applyMiddleware(...middleware), ...enhancers)
     );
+
+    initializeSagaMiddleware.run(weatherForecastSaga);
+
+    window.store = store;
+    return store;
 }
