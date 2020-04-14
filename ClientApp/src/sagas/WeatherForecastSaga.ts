@@ -15,7 +15,7 @@ function* workerSaga(action: RequestWeatherForecastsAction) {
 }
 
 function getData(startDateIndex: number): Promise<ReceiveWeatherForecastsAction> {
-	return fetch(`weatherforecast`)
+	return fetch(isNaN(Number(startDateIndex)) ? 'weatherforecast' : `weatherforecast?startDateIndex=` + startDateIndex)
 			.then(response => response.json() as Promise<WeatherForecast[]>)
 			.then(data => ({ type: 'RECEIVE_WEATHER_FORECASTS', startDateIndex: startDateIndex, forecasts: data } as ReceiveWeatherForecastsAction));
 }
